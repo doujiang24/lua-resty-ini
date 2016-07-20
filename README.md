@@ -8,6 +8,7 @@ Table of Contents
 
 * [Name](#name)
 * [Status](#status)
+* [Synopsis](#synopsis)
 * [Author](#author)
 * [Copyright and License](#copyright-and-license)
 * [See Also](#see-also)
@@ -16,6 +17,59 @@ Status
 ======
 
 This library is still under early development and is still experimental.
+
+
+
+Synopsis
+========
+
+```lua
+    lua_package_path "/path/to/lua-resty-ini/lib/?.lua;;";
+
+    server {
+        location /test {
+            content_by_lua_block {
+                local resty_ini = require "resty.ini"
+
+                local conf, err = resty_ini.parse_file("/path/to/file.ini")
+                if not conf then
+                    ngx.say("failed to parse_file: ", err)
+                    return
+                end
+
+                for section, values in pairs(conf) do
+                    for k, v in pairs(values) do
+                        ngx.say(section, ": '", k, "', '", v, "', ", type(v))
+                    end
+                end
+            }
+        }
+    }
+```
+
+file.ini
+```ini
+[default]
+username = ngx_test
+password = ngx_test
+notes = "just for test"
+number = 10
+
+[guest]
+username= guest
+; guest do not need password
+password = false
+```
+
+```shell
+$ curl "http://127.0.0.1:80/t"
+guest: 'password', 'false', boolean
+guest: 'username', 'guest', string
+default: 'password', 'ngx_test', string
+default: 'username', 'ngx_test', string
+default: 'notes', 'just for test', string
+default: 'number', '10', number
+```
 
 
 Author
