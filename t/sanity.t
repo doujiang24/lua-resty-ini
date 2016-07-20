@@ -46,11 +46,12 @@ __DATA__
 --- request
 GET /t
 --- response_body
-guest: 'passwd', 'false'
 guest: 'username', 'guest'
+guest: 'passwd', 'false'
+guest: 'limit_rate', '1r/s'
 default: 'server', '127.0.0.1'
 default: 'username', 'ngx_test'
-default: 'passwd', 'xx;foo'
+default: 'passwd', 'xx; foo'
 default: 'port', '3306'
 --- no_error_log
 [error]

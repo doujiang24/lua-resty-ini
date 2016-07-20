@@ -9,8 +9,8 @@ local substr = string.sub
 
 local _M = { _VERSION = "0.01" }
 
-local section_pattern = [[ ^\[ ([^ \[ \] ]+) \]$ ]]
-local keyvalue_pattern = [[ ^( [\w_]+ ) \s* = \s* (\S+ | ["'].*["']) (?:\s*;.*)? $ ]]
+local section_pattern = [[ \A \[ ([^ \[ \] ]+) \] \z ]]
+local keyvalue_pattern = [[ \A ( [\w_]+ ) \s* = \s* ( ' [^']* ' | " [^"]* " | \S+ ) (?:\s*)? \z ]]
 
 
 function _M.parse_file(filename)
@@ -31,6 +31,7 @@ function _M.parse_file(filename)
             local m = re_match(line, keyvalue_pattern, "jox")
             if m then
                 if not section then
+                    fp:close()
                     return nil, "no section found before key value pairs appeared"
                 end
 
@@ -50,7 +51,7 @@ function _M.parse_file(filename)
                 elseif value == "false" then
                     val = false
 
-                elseif substr(value, 1, 1) == '"' then
+                elseif substr(value, 1, 1) == '"' or substr(value, 1, 1) == "'" then
                     val = substr(value, 2, -2)
 
                 else
