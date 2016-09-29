@@ -20,7 +20,7 @@ function _M.parse_file(filename)
     end
 
     local data = {};
-    local section
+    local section = "default"
 
     for line in fp:lines() do
         local m = re_match(line, section_pattern, "jox")
@@ -30,11 +30,6 @@ function _M.parse_file(filename)
         else
             local m = re_match(line, keyvalue_pattern, "jox")
             if m then
-                if not section then
-                    fp:close()
-                    return nil, "no section found before key value pairs appeared"
-                end
-
                 if not data[section] then
                     data[section] = {}
                 end
