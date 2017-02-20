@@ -19,7 +19,7 @@ function _M.parse_file(filename)
         return nil, "failed to open file: " .. (err or "")
     end
 
-    local data = {};
+    local data = {}
     local section = "default"
 
     for line in fp:lines() do
