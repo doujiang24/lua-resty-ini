@@ -5,12 +5,14 @@ local io_open = io.open
 local tonumber = tonumber
 local re_match = ngx.re.match
 local substr = string.sub
+local str_byte = string.byte
 
 
 local _M = { _VERSION = "0.01" }
 
 local section_pattern = [[ \A \[ ([^ \[ \] ]+) \] \z ]]
-local keyvalue_pattern = [[ \A ( [\w_]+ ) \s* = \s* ( ' [^']* ' | " [^"]* " | \S+ ) (?:\s*)? \z ]]
+local keyvalue_pattern =
+    [[ \A ( [\w_]+ ) \s* = \s* ( ' [^']* ' | " [^"]* " | \S+ ) (?:\s*)? \z ]]
 
 
 function _M.parse_file(filename)
@@ -38,22 +40,22 @@ function _M.parse_file(filename)
 
                 local val = tonumber(value)
                 if val then
-                    -- do nothing
+                    value = val
 
                 elseif value == "true" then
-                    val = true
+                    value = true
 
                 elseif value == "false" then
-                    val = false
-
-                elseif substr(value, 1, 1) == '"' or substr(value, 1, 1) == "'" then
-                    val = substr(value, 2, -2)
+                    value = false
 
                 else
-                    val = value
+                    local fst = str_byte(value, 1)
+                    if fst == 34 or fst == 39 then  -- ' or "
+                        val = substr(value, 2, -2)
+                    end
                 end
 
-                data[section][key] = val;
+                data[section][key] = value
             end
         end
     end
