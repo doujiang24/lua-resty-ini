@@ -27,15 +27,6 @@ __DATA__
 --- config
     location /t {
         content_by_lua_block {
-
-            local resty_ini = require "resty.ini"
-
-            local conf, err = resty_ini.parse_file("$TEST_NGINX_PATH/t/sample.ini")
-            if not conf then
-                ngx.say("failed to parse_file: ", err)
-                return
-            end
-
             local function sorted_keys(t)
                 local keys = {}
                 for k, _ in pairs(t) do
@@ -43,6 +34,14 @@ __DATA__
                 end
                 table.sort(keys)
                 return keys
+            end
+
+            local resty_ini = require "resty.ini"
+
+            local conf, err = resty_ini.parse_file("$TEST_NGINX_PATH/t/sample.ini")
+            if not conf then
+                ngx.say("failed to parse_file: ", err)
+                return
             end
 
             for _, section in ipairs(sorted_keys(conf)) do
@@ -65,5 +64,7 @@ default: 'username', 'ngx_test'
 guest: 'limit_rate', '1r/s'
 guest: 'passwd', 'false'
 guest: 'username', 'guest'
+space: 'foo', 'bar'
+space: 'name', 'foo'
 --- no_error_log
 [error]

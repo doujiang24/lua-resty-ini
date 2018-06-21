@@ -12,7 +12,7 @@ local _M = { _VERSION = "0.01" }
 
 local section_pattern = [[ \A \[ ([^ \[ \] ]+) \] \z ]]
 local keyvalue_pattern =
-    [[ \A ( [\w_]+ ) \s* = \s* ( ' [^']* ' | " [^"]* " | \S+ ) (?:\s*)? \z ]]
+    [[ \A \s* ( [\w_]+ ) \s* = \s* ( ' [^']* ' | " [^"]* " | \S+ ) (?:\s*)? \z ]]
 
 
 function _M.parse_file(filename)
