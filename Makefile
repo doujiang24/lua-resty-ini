@@ -5,7 +5,7 @@ LUA_INCLUDE_DIR ?= $(PREFIX)/include
 LUA_LIB_DIR ?=     $(PREFIX)/lib/lua/$(LUA_VERSION)
 INSTALL ?= install
 
-export TEST_NGINX_NO_CLEAN=1
+#export TEST_NGINX_NO_CLEAN=1
 
 .PHONY: all test install
 

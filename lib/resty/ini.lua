@@ -51,7 +51,7 @@ function _M.parse_file(filename)
                 else
                     local fst = str_byte(value, 1)
                     if fst == 34 or fst == 39 then  -- ' or "
-                        val = substr(value, 2, -2)
+                        value = substr(value, 2, -2)
                     end
                 end
 

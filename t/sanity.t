@@ -36,8 +36,20 @@ __DATA__
                 return
             end
 
-            for section, values in pairs(conf) do
-                for k, v in pairs(values) do
+            local function sorted_keys(t)
+                local keys = {}
+                for k, _ in pairs(t) do
+                    keys[#keys + 1] = k
+                end
+                table.sort(keys)
+                return keys
+            end
+
+            for _, section in ipairs(sorted_keys(conf)) do
+                local values = conf[section]
+
+                for __, k in ipairs(sorted_keys(values)) do
+                    local v = values[k]
                     ngx.say(section, ": '", k, "', '", v, "'")
                 end
             end
@@ -46,12 +58,12 @@ __DATA__
 --- request
 GET /t
 --- response_body
-guest: 'username', 'guest'
-guest: 'passwd', 'false'
-guest: 'limit_rate', '1r/s'
-default: 'server', '127.0.0.1'
-default: 'username', 'ngx_test'
 default: 'passwd', 'xx; foo'
 default: 'port', '3306'
+default: 'server', '127.0.0.1'
+default: 'username', 'ngx_test'
+guest: 'limit_rate', '1r/s'
+guest: 'passwd', 'false'
+guest: 'username', 'guest'
 --- no_error_log
 [error]
