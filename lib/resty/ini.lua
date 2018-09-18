@@ -4,15 +4,45 @@
 local io_open = io.open
 local tonumber = tonumber
 local re_match = ngx.re.match
+local re_find = ngx.re.find
 local substr = string.sub
 local str_byte = string.byte
 
 
 local _M = { _VERSION = "0.01" }
 
-local section_pattern = [[ \A \[ ([^ \[ \] ]+) \] \z ]]
-local keyvalue_pattern =
-    [[ \A \s* ( [\w_]+ ) \s* = \s* ( ' [^']* ' | " [^"]* " | \S+ ) (?:\s*)? \z ]]
+local section_pattern = [=[ \A \[ ([^\[\]]+) \] \z ]=]
+local keyvalue_pattern = [[ \A \s* ( [\w_]+ ) \s* = \s* ( .+? ) (?: \s* )? \z ]]
+-- space line or comment line
+local comment_parttern = [[ \A (?: (?: \s* ) | (?: [;#] .* ) ) \z ]]
+
+
+local function parse_value (value)
+    if value == "true" then
+        return true
+    end
+
+    if value == "false" then
+        return false
+    end
+
+    local val = tonumber(value)
+    if val then
+        return val
+    end
+
+    local m = re_match(value, [[\A (['"]) (.+) \1 \z]], "jox")
+    if m then
+        return m[2]
+    end
+
+    local from = re_find(value, [=[ ['"] ]=], "jox")
+    if not from then
+        return value
+    end
+
+    return nil, "unsupportted value format: " .. value
+end
 
 
 function _M.parse_file(filename)
@@ -36,26 +66,20 @@ function _M.parse_file(filename)
                     data[section] = {}
                 end
 
-                local key, value = m[1], m[2]
+                local key = m[1]
+                local value, err = parse_value(m[2])
+                if err then
+                    fp:close()
 
-                local val = tonumber(value)
-                if val then
-                    value = val
-
-                elseif value == "true" then
-                    value = true
-
-                elseif value == "false" then
-                    value = false
-
-                else
-                    local fst = str_byte(value, 1)
-                    if fst == 34 or fst == 39 then  -- ' or "
-                        value = substr(value, 2, -2)
-                    end
+                    return nil, err
                 end
 
                 data[section][key] = value
+
+            elseif not re_find(line, comment_parttern, "jox") then
+                fp:close()
+
+                return nil, "unsupportted key value pair format: " .. line
             end
         end
     end

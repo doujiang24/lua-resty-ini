@@ -66,5 +66,55 @@ guest: 'passwd', 'false'
 guest: 'username', 'guest'
 space: 'foo', 'bar'
 space: 'name', 'foo'
+x x: 'location', 'foo bar'
+x x: 'name', 'foo inc.'
+--- no_error_log
+[error]
+
+
+
+=== TEST 2: invalid value
+--- http_config eval: $::HttpConfig
+--- config
+    location /t {
+        content_by_lua_block {
+            local resty_ini = require "resty.ini"
+
+            local conf, err = resty_ini.parse_file("$TEST_NGINX_PATH/t/bad_value.ini")
+            if not conf then
+                ngx.say("failed to parse_file: ", err)
+                return
+            end
+            ngx.say("ok")
+        }
+    }
+--- request
+GET /t
+--- response_body
+failed to parse_file: unsupportted value format: "3306
+--- no_error_log
+[error]
+
+
+
+=== TEST 3: invalid line
+--- http_config eval: $::HttpConfig
+--- config
+    location /t {
+        content_by_lua_block {
+            local resty_ini = require "resty.ini"
+
+            local conf, err = resty_ini.parse_file("$TEST_NGINX_PATH/t/bad_line.ini")
+            if not conf then
+                ngx.say("failed to parse_file: ", err)
+                return
+            end
+            ngx.say("ok")
+        }
+    }
+--- request
+GET /t
+--- response_body
+failed to parse_file: unsupportted key value pair format: p ort = 3306
 --- no_error_log
 [error]
