@@ -64,7 +64,7 @@ default: 'username', 'ngx_test'
 guest: 'limit_rate', '1r/s'
 guest: 'passwd', 'false'
 guest: 'username', 'guest'
-space: 'foo', 'bar'
-space: 'name', 'foo'
+spa ce: 'foo', 'bar'
+spa ce: 'name', 'foo'
 --- no_error_log
 [error]
